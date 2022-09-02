@@ -123,7 +123,7 @@ export default function ParkDetailPage({ parkItem }: any) {
               )}
               onClick={navToKakaoMap}
             >
-              카카오 지도
+              카카오맵
             </button>
           </div>
         </div>
