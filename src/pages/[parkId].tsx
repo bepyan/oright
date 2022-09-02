@@ -7,7 +7,7 @@ import { $ } from '@/utils/core';
 
 export default function ParkDetailPage() {
   return (
-    <Layout className="bg-[#F2F4F6]">
+    <Layout className="">
       <div className="flex px-5 pt-[30px] pb-[10px]">
         <Link href="/">
           <a>
@@ -34,11 +34,10 @@ export default function ParkDetailPage() {
             <div className="text-sm">전체</div>
           </div>
         </div>
-
         <button
           className={$(
             'mx-5 mt-3',
-            'rounded-lg bg-blue-500 p-[15px] text-center font-bold text-white',
+            'rounded-lg bg-blue-500 p-[15px] text-center text-lg font-bold text-white',
             'transition-all active:bg-blue-400',
           )}
         >
