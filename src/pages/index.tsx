@@ -29,6 +29,8 @@ declare global {
 }
 
 const KakaoMap = () => {
+  const router = useRouter();
+
   useEffect(() => {
     const $script = document.createElement('script');
     $script.async = true;
@@ -47,21 +49,16 @@ const KakaoMap = () => {
 
         parkList.forEach((item) => {
           const content = ParkPointer({
-            title: item.meta ? `${item.meta.remain}대 여유` : 'P',
-            status: !item.meta
-              ? 'nomal'
-              : item.meta.remain === 0
-              ? 'full'
-              : item.meta.remain > 100
-              ? 'hightlight'
-              : 'nomal',
+            item,
+            onClick: () => router.push(`/${item.id}`),
           });
           const position = new window.kakao.maps.LatLng(item.latitude, item.longitude);
-          const customOverlay = new window.kakao.maps.CustomOverlay({
+          new window.kakao.maps.CustomOverlay({
+            map,
             content,
             position,
+            clickable: true,
           });
-          customOverlay.setMap(map);
         });
       });
     };
@@ -83,7 +80,10 @@ const ParkItem = ({ item }: { item: any }) => {
   };
 
   return (
-    <div className={$('relative p-5', 'transition-all active:bg-blue-50')} onClick={onClickFindWay}>
+    <div
+      className={$('relative cursor-pointer p-5', 'transition-all active:bg-blue-50')}
+      onClick={onClickFindWay}
+    >
       <div className="text-lg font-bold">{item.title}</div>
 
       <div className="mt-[10px] flex flex-col gap-1">
