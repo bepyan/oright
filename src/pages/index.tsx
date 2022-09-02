@@ -1,29 +1,17 @@
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import ArrowRight from '@/components/icons/ArrowRight';
 import Separator from '@/components/icons/Separator';
 import Layout from '@/components/Layout';
+import ParkPointer from '@/components/ParkPointer';
+import { parkList, 제자들 } from '@/contants/park';
 import { $ } from '@/utils/core';
 
 export default function HomePage() {
   return (
     <Layout>
-      <div className="relative h-[60%] bg-[url('/map.png')] bg-cover bg-no-repeat">
-        <ParkPointer status="hightlight" className="top-12 left-12">
-          {117}대 보유
-        </ParkPointer>
-        <ParkPointer status="nomal" className="top-[24%] left-24">
-          {26}대 보유
-        </ParkPointer>
-        <ParkPointer status="disabled" className="top-24 left-12">
-          {0}대 보유
-        </ParkPointer>
-
-        <ParkPointer status="nomal" className="top-24 left-24">
-          P
-        </ParkPointer>
-      </div>
+      <KakaoMap />
 
       <div className="h-[40%] overflow-y-scroll border-t border-[#e2e2e2] bg-white">
         {[...Array(5)].map((_, i) => (
@@ -34,51 +22,51 @@ export default function HomePage() {
   );
 }
 
-type TParkPointerStatus = 'hightlight' | 'nomal' | 'disabled';
-
-interface ParkPointerProps {
-  className?: string;
-  status: TParkPointerStatus;
-  children?: React.ReactNode;
+declare global {
+  interface Window {
+    kakao: any;
+  }
 }
 
-const ParkPointer = ({ className, status, children }: ParkPointerProps) => {
-  const router = useRouter();
+const KakaoMap = () => {
+  useEffect(() => {
+    const $script = document.createElement('script');
+    $script.async = true;
+    $script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAOMAP_KEY}&autoload=false`;
+    document.head.appendChild($script);
 
-  const onClick = () => {
-    router.push(`/${children?.toString()}`);
-  };
+    const onLoadKakaoMap = () => {
+      window.kakao.maps.load(() => {
+        const centerPosition = new window.kakao.maps.LatLng(제자들.latitude, 제자들.longitude);
+        const map = new window.kakao.maps.Map(document.getElementById('map'), {
+          center: centerPosition,
+          level: 3,
+        });
+        const 제자들Marker = new window.kakao.maps.Marker({ position: centerPosition });
+        제자들Marker.setMap(map);
 
-  return (
-    <div className={$('absolute flex flex-col', className)}>
-      <button
-        onClick={onClick}
-        disabled={status === 'disabled'}
-        className={$(
-          'rounded-lg border-2 px-3 py-2 text-center font-bold',
-          'transition-all active:opacity-90',
-          status === 'hightlight'
-            ? 'border-[#0C79FE] bg-[#0C79FE] text-white'
-            : status === 'nomal'
-            ? 'border-[#66707C] bg-white'
-            : 'border-[#999999] bg-[#dcdcdc] text-[#777777]',
-        )}
-      >
-        {children}
-      </button>
-      <svg
-        width="6"
-        height="20"
-        viewBox="0 0 6 20"
-        fill={status === 'hightlight' ? '#0C79FE' : status === 'nomal' ? '#66707C' : '#999999'}
-        xmlns="http://www.w3.org/2000/svg"
-        className="self-center"
-      >
-        <rect x="2" width="2" height="16" />
-        <circle cx="3" cy="17" r="3" />
-      </svg>
-    </div>
-  );
+        parkList.forEach((item) => {
+          const content = ParkPointer({
+            title: item.title,
+            status: 'hightlight',
+          });
+          const position = new window.kakao.maps.LatLng(item.latitude, item.longitude);
+          const customOverlay = new window.kakao.maps.CustomOverlay({
+            content,
+            position,
+          });
+          customOverlay.setMap(map);
+        });
+      });
+    };
+
+    $script.addEventListener('load', onLoadKakaoMap);
+    return () => {
+      $script.removeEventListener('load', onLoadKakaoMap);
+    };
+  }, []);
+
+  return <div id="map" className="relative h-[60%]" />;
 };
 
 const ParkItem = () => {
