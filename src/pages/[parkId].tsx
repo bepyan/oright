@@ -16,7 +16,7 @@ export default function ParkDetailPage() {
       <div className="flex px-5 pt-[30px] pb-[10px]">
         <Link href="/">
           <a>
-            <ArrowBack className="cursor-pointer" />
+            <ArrowBack className="cursor-pointer transition-all hover:opacity-70" />
           </a>
         </Link>
       </div>
@@ -80,7 +80,7 @@ export default function ParkDetailPage() {
       </div>
 
       <div className="mt-2 bg-white px-5 pt-1 pb-6">
-        <div className="">
+        <div className="space:border-t space:border-[#e2e2e2]">
           <div className="py-4">
             <div className="mb-4 flex items-center gap-1">
               <MoneyIcon />
@@ -105,7 +105,7 @@ export default function ParkDetailPage() {
               </div>
 
               <div className="flex items-center text-sm">
-                <div className="">기본 요금(시간)</div>
+                <div className="">정기권 요금</div>
                 <div className="ml-auto">60,000원</div>
               </div>
             </div>
