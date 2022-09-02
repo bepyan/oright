@@ -23,7 +23,7 @@ const ParkItem = () => {
   const router = useRouter();
 
   const onClickFindWay = () => {
-    router.push('/');
+    router.push('/마천1동');
   };
 
   return (
