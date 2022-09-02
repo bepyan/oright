@@ -5,8 +5,23 @@
 html,
 body,
 #__next {
+  width: 100%;
   height: 100%;
   background-color: #f2f4f6;
+}
+
+html,
+body {
+  position: fixed;
+  overflow: hidden;
+}
+
+#__next {
+  overflow-y: scroll;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
 }
 
 input,

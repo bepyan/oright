@@ -13,7 +13,7 @@ export default function HomePage() {
         <ParkPointer status="hightlight" className="top-12 left-12">
           {117}대 보유
         </ParkPointer>
-        <ParkPointer status="nomal" className="top-12 left-24">
+        <ParkPointer status="nomal" className="top-[24%] left-24">
           {26}대 보유
         </ParkPointer>
         <ParkPointer status="disabled" className="top-24 left-12">
@@ -25,7 +25,7 @@ export default function HomePage() {
         </ParkPointer>
       </div>
 
-      <div className="h-[40%] overflow-scroll border-t border-[#e2e2e2] bg-white">
+      <div className="h-[40%] overflow-y-scroll border-t border-[#e2e2e2] bg-white">
         {[...Array(5)].map((_, i) => (
           <ParkItem key={i} />
         ))}
@@ -89,7 +89,7 @@ const ParkItem = () => {
   };
 
   return (
-    <div className={$('relative p-5', 'transition-all hover:bg-blue-50')}>
+    <div className={$('relative p-5', 'transition-all active:bg-blue-50')} onClick={onClickFindWay}>
       <div className="text-lg font-bold">마천1동 공영공동주차장</div>
 
       <div className="mt-[10px] flex flex-col gap-1">
@@ -107,7 +107,6 @@ const ParkItem = () => {
             'flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#0C79FE]',
             'transition-all active:bg-[#0C79FE90]',
           )}
-          onClick={onClickFindWay}
         >
           <ArrowRight />
         </button>

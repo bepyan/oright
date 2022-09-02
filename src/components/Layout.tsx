@@ -12,7 +12,7 @@ export default function Layout({ className, children, title }: LayoutProps) {
   const ogTitle = !title ? 'oright' : `${title} | oright`;
 
   return (
-    <main className={$('h-full w-screen bg-[#f2f4f6]')}>
+    <main className={$('h-full w-full bg-[#f2f4f6]')}>
       <Head>
         <title>{ogTitle}</title>
         <meta property="og:title" key="title" content={ogTitle} />
