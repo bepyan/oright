@@ -27,3 +27,31 @@ body {
 * {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
+
+.park-pointer > div {
+  border-color: #66707c;
+  background-color: #ffffff;
+  color: #000000;
+}
+.park-pointer > svg {
+  fill: #66707c;
+}
+
+.park-pointer--hightlight > div {
+  border-color: #0c79fe;
+  background-color: #0c79fe;
+  color: #ffffff;
+}
+.park-pointer--hightlight > svg {
+  fill: #0c79fe;
+}
+
+.park-pointer--full > div {
+  border-color: #999999;
+  background-color: #dcdcdc;
+  color: #777777;
+}
+
+.park-pointer--full > svg {
+  fill: #999999;
+}

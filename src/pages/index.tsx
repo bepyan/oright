@@ -60,8 +60,20 @@ export default function HomePage() {
 
   const onFocuseItem = (item: any) => {
     var moveLatLon = new window.kakao.maps.LatLng(item.latitude, item.longitude);
-    kmap.panTo(moveLatLon);
     setFocusedItem(item);
+    kmap.panTo(moveLatLon);
+
+    setTimeout(() => {
+      const $hightlightList = document.querySelectorAll('.park-pointer--hightlight');
+      $hightlightList.forEach(($item) => $item.classList.remove('park-pointer--hightlight'));
+
+      const $target = document.getElementById(`park-pointer-${item.id}`);
+      if ($target) {
+        $target.classList.add('park-pointer--hightlight');
+      }
+
+      console.log($target);
+    }, 300);
   };
 
   const navToDetailParkItem = (id: number | string) => {
