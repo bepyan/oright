@@ -12,7 +12,7 @@ export default function Layout({ className, children, title }: LayoutProps) {
   const ogTitle = !title ? 'oright' : `${title} | oright`;
 
   return (
-    <main className={$('h-full w-screen')}>
+    <main className={$('h-full w-screen bg-gray-50')}>
       <Head>
         <title>{ogTitle}</title>
         <meta property="og:title" key="title" content={ogTitle} />
@@ -20,7 +20,9 @@ export default function Layout({ className, children, title }: LayoutProps) {
         <meta property="og:image" key="image" content={''} />
       </Head>
 
-      <div className={$('relative mx-auto w-full max-w-xl', className)}>{children}</div>
+      <div className={$('relative mx-auto h-full w-full max-w-md bg-white', className)}>
+        {children}
+      </div>
     </main>
   );
 }
