@@ -23,5 +23,10 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addVariant }) {
+      addVariant('child', '& > *');
+      addVariant('space', '& > :not([hidden]) ~ :not([hidden])');
+    },
+  ],
 };
