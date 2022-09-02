@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect } from 'react';
 
 import ArrowRight from '@/components/icons/ArrowRight';
+import RefreshIcon from '@/components/icons/RefreshIcon';
 import Separator from '@/components/icons/Separator';
 import Layout from '@/components/Layout';
 import ParkPointer from '@/components/ParkPointer';
@@ -69,7 +70,20 @@ const KakaoMap = () => {
     };
   }, []);
 
-  return <div id="map" className="relative h-[60%]" />;
+  return (
+    <div className="relative h-[60%]">
+      <div id="map" className="h-full w-full" />
+      <button
+        className={$(
+          'absolute bottom-8 right-4 z-50 flex h-11 w-11 items-center justify-center',
+          'rounded-full border border-[#e2e2e2] bg-white shadow',
+          'transition-all active:opacity-80',
+        )}
+      >
+        <RefreshIcon />
+      </button>
+    </div>
+  );
 };
 
 const ParkItem = ({ item }: { item: any }) => {
