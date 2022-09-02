@@ -1,6 +1,6 @@
 export const 제자들 = {
-  latitude: 37.4962744992276,
-  longitude: 127.15720367562967,
+  latitude: 37.4964504992276,
+  longitude: 127.157167007562967,
 };
 
 export const parkList = [

@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import ArrowRight from '@/components/icons/ArrowRight';
 import RefreshIcon from '@/components/icons/RefreshIcon';
@@ -9,28 +9,16 @@ import ParkPointer from '@/components/ParkPointer';
 import { parkList, 제자들 } from '@/contants/park';
 import { $ } from '@/utils/core';
 
-export default function HomePage() {
-  return (
-    <Layout>
-      <KakaoMap />
-
-      <div className="h-[40%] overflow-y-scroll border-t border-[#e2e2e2] bg-white">
-        {parkList.map((item, i) => (
-          <ParkItem key={i} item={item} />
-        ))}
-      </div>
-    </Layout>
-  );
-}
-
 declare global {
   interface Window {
     kakao: any;
   }
 }
 
-const KakaoMap = () => {
+export default function HomePage() {
   const router = useRouter();
+  const [kmap, setKmap] = useState<any>();
+  const [focusedItem, setFocusedItem] = useState<any>();
 
   useEffect(() => {
     const $script = document.createElement('script');
@@ -45,8 +33,7 @@ const KakaoMap = () => {
           center: centerPosition,
           level: 3,
         });
-        const 제자들Marker = new window.kakao.maps.Marker({ position: centerPosition });
-        제자들Marker.setMap(map);
+        new window.kakao.maps.Marker({ position: centerPosition, map });
 
         parkList.forEach((item) => {
           const content = ParkPointer({
@@ -58,9 +45,10 @@ const KakaoMap = () => {
             map,
             content,
             position,
-            clickable: true,
           });
         });
+
+        setKmap(map);
       });
     };
 
@@ -70,33 +58,65 @@ const KakaoMap = () => {
     };
   }, []);
 
-  return (
-    <div className="relative h-[60%]">
-      <div id="map" className="h-full w-full" />
-      <button
-        className={$(
-          'absolute bottom-8 right-4 z-50 flex h-11 w-11 items-center justify-center',
-          'rounded-full border border-[#e2e2e2] bg-white shadow',
-          'transition-all active:opacity-80',
-        )}
-      >
-        <RefreshIcon />
-      </button>
-    </div>
-  );
-};
+  const onFocuseItem = (item: any) => {
+    var moveLatLon = new window.kakao.maps.LatLng(item.latitude, item.longitude);
+    kmap.panTo(moveLatLon);
+    setFocusedItem(item);
+  };
 
-const ParkItem = ({ item }: { item: any }) => {
-  const router = useRouter();
-
-  const onClickFindWay = () => {
-    router.push(`/${item.id}`);
+  const navToDetailParkItem = (id: number | string) => {
+    router.push(`/${id}`);
   };
 
   return (
+    <Layout>
+      <div className="relative h-[60%]">
+        <div id="map" className="h-full w-full" />
+        <button
+          className={$(
+            'absolute bottom-8 right-4 z-50 flex h-11 w-11 items-center justify-center',
+            'rounded-full border border-[#e2e2e2] bg-white shadow',
+            'transition-all active:opacity-80',
+          )}
+        >
+          <RefreshIcon />
+        </button>
+      </div>
+
+      <div className="h-[40%] overflow-y-scroll border-t border-[#e2e2e2] bg-white">
+        {parkList.map((item, i) => (
+          <ParkItem
+            key={i}
+            item={item}
+            isSelected={focusedItem?.id === item.id}
+            onClick={() => onFocuseItem(item)}
+            onClickFindWay={() => navToDetailParkItem(item.id)}
+          />
+        ))}
+      </div>
+    </Layout>
+  );
+}
+
+const ParkItem = ({
+  item,
+  isSelected,
+  onClick,
+  onClickFindWay,
+}: {
+  item: any;
+  isSelected?: boolean;
+  onClick: () => void;
+  onClickFindWay: () => void;
+}) => {
+  return (
     <div
-      className={$('relative cursor-pointer p-5', 'transition-all active:bg-blue-50')}
-      onClick={onClickFindWay}
+      className={$(
+        'relative cursor-pointer p-5',
+        'transition-all active:bg-[#0C79FE] active:bg-opacity-[0.02]',
+        isSelected && 'bg-[#0C79FE] bg-opacity-5',
+      )}
+      onClick={onClick}
     >
       <div className="text-lg font-bold">{item.title}</div>
 
@@ -120,6 +140,10 @@ const ParkItem = ({ item }: { item: any }) => {
             'flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#0C79FE]',
             'transition-all active:bg-[#0C79FE90]',
           )}
+          onClick={(e) => {
+            e.stopPropagation();
+            onClickFindWay();
+          }}
         >
           <ArrowRight />
         </button>
