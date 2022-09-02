@@ -24,14 +24,9 @@ export default function ParkDetailPage() {
       <div className="flex flex-col pb-5">
         <h1 className="self-center text-2xl font-bold">마천1동 공영공동주차장</h1>
         <div className="mx-5 mt-5 flex h-[100px] items-center rounded-lg bg-white">
-          <div className="flex-1 text-center font-bold text-[#0AB5CF]">
-            <div className="text-2xl">{32}</div>
-            <div className="text-sm">주차 예약</div>
-          </div>
-          <Separator height={40} />
           <div className="flex-1 text-center font-bold text-[#0C79FE]">
             <div className="text-2xl">{117}</div>
-            <div className="text-sm">주차 가능</div>
+            <div className="text-sm">주차 여유</div>
           </div>
           <Separator height={40} />
           <div className="flex-1 text-center font-bold text-[#697483]">

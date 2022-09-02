@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 
+import ArrowRight from '@/components/icons/ArrowRight';
 import Separator from '@/components/icons/Separator';
 import Layout from '@/components/Layout';
 import { $ } from '@/utils/core';
@@ -7,11 +8,11 @@ import { $ } from '@/utils/core';
 export default function HomePage() {
   return (
     <Layout>
-      <div className="">
+      <div className="h-[60%]">
         <div className="bg-gray-100"></div>
       </div>
 
-      <div className="">
+      <div className="h-[40%] overflow-scroll border-t border-[#e2e2e2] bg-white">
         {[...Array(5)].map((_, i) => (
           <ParkItem key={i} />
         ))}
@@ -33,8 +34,6 @@ const ParkItem = () => {
 
       <div className="mt-[10px] flex flex-col gap-1">
         <div className="flex items-center gap-1.5 text-sm">
-          <span className="font-bold text-[#0AB5CF]">{32}대 예약</span>
-          <Separator />
           <span className="font-bold text-[#0C79FE]">{117}대 여유</span>
           <Separator />
           <span className="text-[#697483]">{217}대 전체</span>
@@ -42,15 +41,15 @@ const ParkItem = () => {
         <div className="text-sm text-[#697483]">서울 송파구 마천동 215-0</div>
       </div>
 
-      <div className="absolute top-4 right-5">
+      <div className="absolute top-5 right-5">
         <button
           className={$(
-            'h-[34px] w-20 rounded-full bg-[#0C79FE] text-center text-xs font-bold text-white',
+            'flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#0C79FE]',
             'transition-all active:bg-[#0C79FE90]',
           )}
           onClick={onClickFindWay}
         >
-          길찾기
+          <ArrowRight />
         </button>
       </div>
     </div>
