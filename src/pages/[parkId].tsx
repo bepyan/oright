@@ -1,6 +1,8 @@
 import Link from 'next/link';
 
 import ArrowBack from '@/components/icons/ArrowBack';
+import LocaltionIcon from '@/components/icons/LocationIcon';
+import PhoneIcon from '@/components/icons/PhoneIcon';
 import Separator from '@/components/icons/Separator';
 import Layout from '@/components/Layout';
 import { $ } from '@/utils/core';
@@ -47,7 +49,7 @@ export default function ParkDetailPage() {
 
       <div className="bg-white py-2">
         <div className="flex items-center py-2 px-5">
-          <div className="h-3 w-3 bg-[#68717C]"></div>
+          <PhoneIcon />
           <div className="ml-2 text-sm">02-430-7240</div>
           <div className="ml-auto">
             <button
@@ -63,7 +65,7 @@ export default function ParkDetailPage() {
         </div>
 
         <div className="flex items-center py-2 px-5">
-          <div className="h-3 w-3 bg-[#68717C]"></div>
+          <LocaltionIcon />
           <div className="ml-2 text-sm">서울 송파구 마천동 215-0</div>
           <div className="ml-auto">
             <button
