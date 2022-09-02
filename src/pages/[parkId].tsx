@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 import ArrowBack from '@/components/icons/ArrowBack';
 import ClockIcon from '@/components/icons/ClockIcon';
@@ -11,6 +12,26 @@ import Layout from '@/components/Layout';
 import { $ } from '@/utils/core';
 
 export default function ParkDetailPage() {
+  const router = useRouter();
+
+  const navToFindWay = () => {
+    window.open(
+      `https://map.kakao.com/link/to/${'마천1동 공영공동주차장'},37.493106585305,127.15299824927`,
+      '_ blank',
+    );
+  };
+
+  const navToPhoneCall = () => {
+    router.push('tel:02-430-7240');
+  };
+
+  const navToKakaoMap = () => {
+    window.open(
+      `https://map.kakao.com/link/map/${'마천1동 공영공동주차장'},37.493106585305,127.15299824927`,
+      '_ blank',
+    );
+  };
+
   return (
     <Layout className="">
       <div className="flex px-5 pt-[30px] pb-[10px]">
@@ -40,6 +61,7 @@ export default function ParkDetailPage() {
             'rounded-lg bg-blue-500 p-[15px] text-center text-lg font-bold text-white',
             'transition-all active:bg-blue-400',
           )}
+          onClick={navToFindWay}
         >
           길찾기
         </button>
@@ -56,6 +78,7 @@ export default function ParkDetailPage() {
                 'rounded-full border border-[#0C79FE]',
                 'transition-all active:text-opacity-50',
               )}
+              onClick={navToPhoneCall}
             >
               전화하기
             </button>
@@ -72,8 +95,9 @@ export default function ParkDetailPage() {
                 'rounded-full border border-[#0C79FE]',
                 'transition-all active:text-opacity-50',
               )}
+              onClick={navToKakaoMap}
             >
-              네이버 지도
+              카카오 지도
             </button>
           </div>
         </div>
