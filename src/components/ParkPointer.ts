@@ -36,8 +36,8 @@ export default function ParkPointer({ title, status }: ParkPointerProps) {
         <div class='flex flex-col items-center'>
             <div
                 class="${$(
-                  'rounded-lg border-2 px-3 py-2 text-center font-bold',
-                  'transition-all active:opacity-90',
+                  'cursor-pointer rounded-lg border-2 px-3 py-2 text-center font-bold select-none',
+                  'transition-all active:opacity-70',
                 )}"
                 style="
                     border-color:${colors[status].border};

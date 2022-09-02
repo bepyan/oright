@@ -14,8 +14,8 @@ export default function HomePage() {
       <KakaoMap />
 
       <div className="h-[40%] overflow-y-scroll border-t border-[#e2e2e2] bg-white">
-        {[...Array(5)].map((_, i) => (
-          <ParkItem key={i} />
+        {parkList.map((item, i) => (
+          <ParkItem key={i} item={item} />
         ))}
       </div>
     </Layout>
@@ -47,8 +47,14 @@ const KakaoMap = () => {
 
         parkList.forEach((item) => {
           const content = ParkPointer({
-            title: item.title,
-            status: 'hightlight',
+            title: item.meta ? `${item.meta.remain}대 여유` : 'P',
+            status: !item.meta
+              ? 'nomal'
+              : item.meta.remain === 0
+              ? 'full'
+              : item.meta.remain > 100
+              ? 'hightlight'
+              : 'nomal',
           });
           const position = new window.kakao.maps.LatLng(item.latitude, item.longitude);
           const customOverlay = new window.kakao.maps.CustomOverlay({
@@ -69,26 +75,31 @@ const KakaoMap = () => {
   return <div id="map" className="relative h-[60%]" />;
 };
 
-const ParkItem = () => {
+const ParkItem = ({ item }: { item: any }) => {
   const router = useRouter();
 
   const onClickFindWay = () => {
-    router.push('/마천1동');
+    router.push(`/${item.id}`);
   };
 
   return (
     <div className={$('relative p-5', 'transition-all active:bg-blue-50')} onClick={onClickFindWay}>
-      <div className="text-lg font-bold">마천1동 공영공동주차장</div>
+      <div className="text-lg font-bold">{item.title}</div>
 
       <div className="mt-[10px] flex flex-col gap-1">
-        <div className="flex items-center gap-1.5 text-sm">
-          <span className="font-bold text-[#0C79FE]">{117}대 여유</span>
-          <Separator />
-          <span className="text-[#697483]">{217}대 전체</span>
-        </div>
-        <div className="text-sm text-[#697483]">서울 송파구 마천동 215-0</div>
+        {item.meta && (
+          <div className="flex items-center gap-1.5 text-sm">
+            <span
+              className={$('font-bold', item.meta.remain > 0 ? 'text-[#0C79FE]' : 'text-[#697483]')}
+            >
+              {item.meta.remain}대 여유
+            </span>
+            <Separator />
+            <span className="text-[#697483]">{item.meta.total}대 전체</span>
+          </div>
+        )}
+        <div className="text-sm text-[#697483]">{item.location}</div>
       </div>
-
       <div className="absolute top-5 right-5">
         <button
           className={$(

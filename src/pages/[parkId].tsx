@@ -1,3 +1,4 @@
+import { GetServerSidePropsContext } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
@@ -9,25 +10,47 @@ import MoneyIcon from '@/components/icons/MoneyIcon';
 import PhoneIcon from '@/components/icons/PhoneIcon';
 import Separator from '@/components/icons/Separator';
 import Layout from '@/components/Layout';
+import { parkList } from '@/contants/park';
 import { $ } from '@/utils/core';
 
-export default function ParkDetailPage() {
+export async function getServerSideProps({ query }: GetServerSidePropsContext) {
+  const { parkId } = query;
+
+  const parkItem = parkList.find((item) => item.id.toString() === parkId);
+
+  if (!parkItem) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/',
+      },
+    };
+  }
+
+  return {
+    props: {
+      parkItem,
+    },
+  };
+}
+
+export default function ParkDetailPage({ parkItem }: any) {
   const router = useRouter();
 
   const navToFindWay = () => {
     window.open(
-      `https://map.kakao.com/link/to/${'마천1동 공영공동주차장'},37.493106585305,127.15299824927`,
+      `https://map.kakao.com/link/to/${parkItem.title},${parkItem.latitude},${parkItem.longitude}`,
       '_ blank',
     );
   };
 
   const navToPhoneCall = () => {
-    router.push('tel:02-430-7240');
+    router.push(`tel:${parkItem.phone}`);
   };
 
   const navToKakaoMap = () => {
     window.open(
-      `https://map.kakao.com/link/map/${'마천1동 공영공동주차장'},37.493106585305,127.15299824927`,
+      `https://map.kakao.com/link/map/${parkItem.title},${parkItem.latitude},${parkItem.longitude}`,
       '_ blank',
     );
   };
@@ -43,23 +66,26 @@ export default function ParkDetailPage() {
       </div>
 
       <div className="flex flex-col pb-5">
-        <h1 className="self-center text-2xl font-bold">마천1동 공영공동주차장</h1>
-        <div className="mx-5 mt-5 flex h-[100px] items-center rounded-lg bg-white">
-          <div className="flex-1 text-center font-bold text-[#0C79FE]">
-            <div className="text-2xl">{117}</div>
-            <div className="text-sm">주차 여유</div>
+        <h1 className="self-center text-2xl font-bold">{parkItem.title}</h1>
+        {parkItem.meta && (
+          <div className="mx-5 mt-5 flex h-[100px] items-center rounded-lg bg-white">
+            <div className="flex-1 text-center font-bold text-[#0C79FE]">
+              <div className="text-2xl">{parkItem.meta.remain}</div>
+              <div className="text-sm">주차 여유</div>
+            </div>
+            <Separator height={40} />
+            <div className="flex-1 text-center font-bold text-[#697483]">
+              <div className="text-2xl">{parkItem.meta.total}</div>
+              <div className="text-sm">전체</div>
+            </div>
           </div>
-          <Separator height={40} />
-          <div className="flex-1 text-center font-bold text-[#697483]">
-            <div className="text-2xl">{217}</div>
-            <div className="text-sm">전체</div>
-          </div>
-        </div>
+        )}
         <button
           className={$(
             'mx-5 mt-3',
             'rounded-lg bg-blue-500 p-[15px] text-center text-lg font-bold text-white',
             'transition-all active:bg-blue-400',
+            !parkItem.meta && 'mt-12',
           )}
           onClick={navToFindWay}
         >
@@ -70,7 +96,7 @@ export default function ParkDetailPage() {
       <div className="bg-white py-2">
         <div className="flex items-center py-2 px-5">
           <PhoneIcon />
-          <div className="ml-2 text-sm">02-430-7240</div>
+          <div className="ml-2 text-sm">{parkItem.phone}</div>
           <div className="ml-auto">
             <button
               className={$(
@@ -87,7 +113,7 @@ export default function ParkDetailPage() {
 
         <div className="flex items-center py-2 px-5">
           <LocaltionIcon />
-          <div className="ml-2 text-sm">서울 송파구 마천동 215-0</div>
+          <div className="ml-2 text-sm">{parkItem.location}</div>
           <div className="ml-auto">
             <button
               className={$(
