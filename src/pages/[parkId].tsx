@@ -1,7 +1,10 @@
 import Link from 'next/link';
 
 import ArrowBack from '@/components/icons/ArrowBack';
+import ClockIcon from '@/components/icons/ClockIcon';
+import FileIcon from '@/components/icons/FileIcon';
 import LocaltionIcon from '@/components/icons/LocationIcon';
+import MoneyIcon from '@/components/icons/MoneyIcon';
 import PhoneIcon from '@/components/icons/PhoneIcon';
 import Separator from '@/components/icons/Separator';
 import Layout from '@/components/Layout';
@@ -81,29 +84,62 @@ export default function ParkDetailPage() {
         </div>
       </div>
 
-      <div className="mt-2 bg-white p-5">
-        <div className="flex flex-col gap-2 rounded-xl bg-[#F9ECEE] p-4 text-sm text-[#C01A34]">
-          <span>· 주차 가능이 0일 경우 예약할 수 없습니다.</span>
-          <span>· 예약된 주차는 오후 1시가 지나면 모두 해제됩니다.</span>
-        </div>
-
-        <div className="mt-[10px]">
+      <div className="mt-2 bg-white px-5 pt-1 pb-6">
+        <div className="">
           <div className="py-4">
             <div className="mb-4 flex items-center gap-1">
-              <div></div>
+              <MoneyIcon />
               <div className="text-base font-bold">요금 정보</div>
             </div>
             <div className=" flex flex-col gap-2">
               <div className="flex items-center text-sm">
                 <div className="">기본 요금(시간)</div>
-                <div className="ml-auto">50원 | 5분</div>
+                <div className="ml-auto flex items-center gap-1.5">
+                  <span>50원</span>
+                  <Separator />
+                  <span>5분</span>
+                </div>
+              </div>
+              <div className="flex items-center text-sm">
+                <div className="">추가 요금(시간)</div>
+                <div className="ml-auto flex items-center gap-1.5">
+                  <span>50원</span>
+                  <Separator />
+                  <span>5분</span>
+                </div>
+              </div>
+
+              <div className="flex items-center text-sm">
+                <div className="">기본 요금(시간)</div>
+                <div className="ml-auto">60,000원</div>
               </div>
             </div>
           </div>
 
           <div className="py-4">
             <div className="mb-4 flex items-center gap-1">
-              <div></div>
+              <ClockIcon />
+              <div className="text-base font-bold">운영 정보</div>
+            </div>
+            <div className=" flex flex-col gap-2">
+              <div className="flex items-center text-sm">
+                <div className="">평일</div>
+                <div className="ml-auto">24시간</div>
+              </div>
+              <div className="flex items-center text-sm">
+                <div className="">토요일</div>
+                <div className="ml-auto">24시간</div>
+              </div>
+              <div className="flex items-center text-sm">
+                <div className="">공휴일</div>
+                <div className="ml-auto">24시간</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="py-4">
+            <div className="mb-4 flex items-center gap-1">
+              <FileIcon />
               <div className="text-base font-bold">기타 정보</div>
             </div>
             <div className="text-sm leading-[22px]">
