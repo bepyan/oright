@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router';
+import NProgress from 'nprogress';
 import React, { useEffect, useMemo, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 
@@ -42,6 +43,14 @@ export default function HomePage() {
 
     return [...PRIVATE_PARK_INFO_LIST, ...parkInfoList];
   }, [parkInfoMeta.data, parkInfoReal.data]);
+
+  useEffect(() => {
+    if (parkInfoMeta.isValidating || parkInfoReal.isValidating) {
+      NProgress.start();
+    } else {
+      NProgress.done();
+    }
+  }, [parkInfoMeta.isValidating, parkInfoReal.isValidating]);
 
   useEffect(() => {
     const $script = document.createElement('script');
