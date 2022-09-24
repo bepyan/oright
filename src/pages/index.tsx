@@ -1,5 +1,7 @@
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import NProgress from 'nprogress';
+import React, { useEffect, useMemo, useState } from 'react';
+import useSWR, { useSWRConfig } from 'swr';
 
 import ArrowRight from '@/components/icons/ArrowRight';
 import RefreshIcon from '@/components/icons/RefreshIcon';
@@ -7,7 +9,7 @@ import Separator from '@/components/icons/Separator';
 import Layout from '@/components/Layout';
 import ParkPointer from '@/components/ParkPointer';
 import { PARK_INFO_LIST, 제자들 } from '@/contants/park';
-import { TParkRealtimeInfo } from '@/types/models';
+import { TParkCapacityInfo, TParkInfo, TParkRealtimeInfo } from '@/types/models';
 import { $ } from '@/utils/core';
 
 declare global {
@@ -21,34 +23,34 @@ export default function HomePage() {
   const [kmap, setKmap] = useState<any>();
   const [focusedItem, setFocusedItem] = useState<any>();
 
-  // const swr = useSWRConfig();
-  // const parkInfoMeta = useSWR<TParkMetaInfo[]>('/v1/parkInfoMetadataAll');
-  // const parkInfoReal = useSWR<TParkRealInfo[]>('/v1/parkInfoRealTimeAll');
+  const swr = useSWRConfig();
+  const parkInfoMeta = useSWR<TParkInfo[]>('/v1/parkInfoMetadataAll');
+  const parkInfoReal = useSWR<TParkCapacityInfo[]>('/v1/parkInfoRealTimeAll');
 
-  // const onRefresh = () => {
-  //   swr.mutate('/v1/parkInfoRealTimeAll');
-  // };
+  const onRefresh = () => {
+    swr.mutate('/v1/parkInfoRealTimeAll');
+  };
 
-  // const parkRealInfoList: TParkInfo[] = useMemo(() => {
-  //   if (!parkInfoMeta.data || !parkInfoReal.data) {
-  //     return [...PARK_INFO_LIST];
-  //   }
+  const parkRealInfoList: TParkRealtimeInfo[] = useMemo(() => {
+    if (!parkInfoMeta.data || !parkInfoReal.data) {
+      return [...PARK_INFO_LIST];
+    }
 
-  //   const parkInfoList: TParkInfo[] = parkInfoMeta.data.map((info) => {
-  //     const realInfo = parkInfoReal.data?.find((realInfo) => realInfo.id === info.id);
-  //     return { ...info, meta: realInfo };
-  //   });
+    const parkInfoList: TParkInfo[] = parkInfoMeta.data.map((info) => {
+      const realInfo = parkInfoReal.data?.find((realInfo) => realInfo.id === info.id);
+      return { ...info, meta: realInfo };
+    });
 
-  //   return [...PARK_INFO_LIST, ...parkInfoList];
-  // }, [parkInfoMeta.data, parkInfoReal.data]);
+    return [...PARK_INFO_LIST, ...parkInfoList];
+  }, [parkInfoMeta.data, parkInfoReal.data]);
 
-  // useEffect(() => {
-  //   if (parkInfoMeta.isValidating || parkInfoReal.isValidating) {
-  //     NProgress.start();
-  //   } else {
-  //     NProgress.done();
-  //   }
-  // }, [parkInfoMeta.isValidating, parkInfoReal.isValidating]);
+  useEffect(() => {
+    if (parkInfoMeta.isValidating || parkInfoReal.isValidating) {
+      NProgress.start();
+    } else {
+      NProgress.done();
+    }
+  }, [parkInfoMeta.isValidating, parkInfoReal.isValidating]);
 
   useEffect(() => {
     const $script = document.createElement('script');
@@ -125,7 +127,7 @@ export default function HomePage() {
             'rounded-full border border-[#e2e2e2] bg-white shadow',
             'transition-all active:opacity-80',
           )}
-          // onClick={onRefresh}
+          onClick={onRefresh}
         >
           <RefreshIcon />
         </button>
