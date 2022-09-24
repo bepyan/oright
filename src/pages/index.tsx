@@ -1,15 +1,13 @@
 import { useRouter } from 'next/router';
-import NProgress from 'nprogress';
-import React, { useEffect, useMemo, useState } from 'react';
-import useSWR, { useSWRConfig } from 'swr';
+import React, { useEffect, useState } from 'react';
 
 import ArrowRight from '@/components/icons/ArrowRight';
 import RefreshIcon from '@/components/icons/RefreshIcon';
 import Separator from '@/components/icons/Separator';
 import Layout from '@/components/Layout';
 import ParkPointer from '@/components/ParkPointer';
-import { PRIVATE_PARK_INFO_LIST, 제자들 } from '@/contants/park';
-import { TParkInfo, TParkMetaInfo, TParkRealInfo } from '@/types/models';
+import { PARK_INFO_LIST, 제자들 } from '@/contants/park';
+import { TParkRealtimeInfo } from '@/types/models';
 import { $ } from '@/utils/core';
 
 declare global {
@@ -23,34 +21,34 @@ export default function HomePage() {
   const [kmap, setKmap] = useState<any>();
   const [focusedItem, setFocusedItem] = useState<any>();
 
-  const swr = useSWRConfig();
-  const parkInfoMeta = useSWR<TParkMetaInfo[]>('/v1/parkInfoMetadataAll');
-  const parkInfoReal = useSWR<TParkRealInfo[]>('/v1/parkInfoRealTimeAll');
+  // const swr = useSWRConfig();
+  // const parkInfoMeta = useSWR<TParkMetaInfo[]>('/v1/parkInfoMetadataAll');
+  // const parkInfoReal = useSWR<TParkRealInfo[]>('/v1/parkInfoRealTimeAll');
 
-  const onRefresh = () => {
-    swr.mutate('/v1/parkInfoRealTimeAll');
-  };
+  // const onRefresh = () => {
+  //   swr.mutate('/v1/parkInfoRealTimeAll');
+  // };
 
-  const parkRealInfoList: TParkInfo[] = useMemo(() => {
-    if (!parkInfoMeta.data || !parkInfoReal.data) {
-      return [...PRIVATE_PARK_INFO_LIST];
-    }
+  // const parkRealInfoList: TParkInfo[] = useMemo(() => {
+  //   if (!parkInfoMeta.data || !parkInfoReal.data) {
+  //     return [...PARK_INFO_LIST];
+  //   }
 
-    const parkInfoList: TParkInfo[] = parkInfoMeta.data.map((info) => {
-      const realInfo = parkInfoReal.data?.find((realInfo) => realInfo.id === info.id);
-      return { ...info, meta: realInfo };
-    });
+  //   const parkInfoList: TParkInfo[] = parkInfoMeta.data.map((info) => {
+  //     const realInfo = parkInfoReal.data?.find((realInfo) => realInfo.id === info.id);
+  //     return { ...info, meta: realInfo };
+  //   });
 
-    return [...PRIVATE_PARK_INFO_LIST, ...parkInfoList];
-  }, [parkInfoMeta.data, parkInfoReal.data]);
+  //   return [...PARK_INFO_LIST, ...parkInfoList];
+  // }, [parkInfoMeta.data, parkInfoReal.data]);
 
-  useEffect(() => {
-    if (parkInfoMeta.isValidating || parkInfoReal.isValidating) {
-      NProgress.start();
-    } else {
-      NProgress.done();
-    }
-  }, [parkInfoMeta.isValidating, parkInfoReal.isValidating]);
+  // useEffect(() => {
+  //   if (parkInfoMeta.isValidating || parkInfoReal.isValidating) {
+  //     NProgress.start();
+  //   } else {
+  //     NProgress.done();
+  //   }
+  // }, [parkInfoMeta.isValidating, parkInfoReal.isValidating]);
 
   useEffect(() => {
     const $script = document.createElement('script');
@@ -67,7 +65,7 @@ export default function HomePage() {
         });
         new window.kakao.maps.Marker({ position: centerPosition, map });
 
-        parkRealInfoList.forEach((item) => {
+        PARK_INFO_LIST.forEach((item) => {
           const content = ParkPointer({
             item,
             onClick: () => router.push(`/${item.id}`),
@@ -127,14 +125,14 @@ export default function HomePage() {
             'rounded-full border border-[#e2e2e2] bg-white shadow',
             'transition-all active:opacity-80',
           )}
-          onClick={onRefresh}
+          // onClick={onRefresh}
         >
           <RefreshIcon />
         </button>
       </div>
 
       <div className="h-[40%] overflow-y-scroll border-t border-[#e2e2e2] bg-white">
-        {parkRealInfoList.map((item) => (
+        {PARK_INFO_LIST.map((item) => (
           <ParkItem
             key={item.id}
             item={item}
@@ -154,7 +152,7 @@ const ParkItem = ({
   onClick,
   onClickFindWay,
 }: {
-  item: TParkInfo;
+  item: TParkRealtimeInfo;
   isSelected?: boolean;
   onClick: () => void;
   onClickFindWay: () => void;

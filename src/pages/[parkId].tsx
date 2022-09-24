@@ -10,14 +10,14 @@ import MoneyIcon from '@/components/icons/MoneyIcon';
 import PhoneIcon from '@/components/icons/PhoneIcon';
 import Separator from '@/components/icons/Separator';
 import Layout from '@/components/Layout';
-import { PRIVATE_PARK_INFO_LIST } from '@/contants/park';
-import { TParkInfo } from '@/types/models';
+import { PARK_INFO_LIST } from '@/contants/park';
+import { TParkRealtimeInfo } from '@/types/models';
 import { $ } from '@/utils/core';
 
 export async function getServerSideProps({ query }: GetServerSidePropsContext) {
   const { parkId } = query;
 
-  const parkItem = PRIVATE_PARK_INFO_LIST.find((item) => item.id.toString() === parkId);
+  const parkItem = PARK_INFO_LIST.find((item) => item.id.toString() === parkId);
 
   if (!parkItem) {
     return {
@@ -35,7 +35,7 @@ export async function getServerSideProps({ query }: GetServerSidePropsContext) {
   };
 }
 
-export default function ParkDetailPage({ parkItem }: { parkItem: TParkInfo }) {
+export default function ParkDetailPage({ parkItem }: { parkItem: TParkRealtimeInfo }) {
   const router = useRouter();
 
   const navToFindWay = () => {
@@ -137,36 +137,37 @@ export default function ParkDetailPage({ parkItem }: { parkItem: TParkInfo }) {
               <MoneyIcon />
               <div className="text-base font-bold">요금 정보</div>
             </div>
-            <div className=" flex flex-col gap-2">
-              <div className="flex items-center text-sm">
-                <div className="">기본 요금(시간)</div>
-                <div className="ml-auto flex items-center gap-1.5">
-                  <span>{parkItem.rates}원</span>
-                  <Separator />
-                  <span>{parkItem.time_rate}분</span>
+            {!parkItem.payment ? (
+              <div>
+                <div className="flex items-center text-sm">
+                  <div className=""></div>
+                  <div className="ml-auto">무료</div>
                 </div>
               </div>
-              <div className="flex items-center text-sm">
-                <div className="">추가 요금(시간)</div>
-                <div className="ml-auto flex items-center gap-1.5">
-                  <span>{parkItem.add_rates}원</span>
-                  <Separator />
-                  <span>{parkItem.add_time_rate}분</span>
+            ) : (
+              <div className=" flex flex-col gap-2">
+                <div className="flex items-center text-sm">
+                  <div className="">기본 요금(시간)</div>
+                  <div className="ml-auto flex items-center gap-1.5">
+                    <span>{parkItem.payment.rates}원</span>
+                    <Separator />
+                    <span>{parkItem.payment.time_rate}분</span>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center text-sm">
-                <div className="">토요일</div>
-                <div className="ml-auto">{parkItem.saturday_pay_name}</div>
-              </div>
-              <div className="flex items-center text-sm">
-                <div className="">공휴일(일요일)</div>
-                <div className="ml-auto">{parkItem.holiday_pay_name}</div>
-              </div>
-              {/* <div className="flex items-center text-sm">
+                <div className="flex items-center text-sm">
+                  <div className="">추가 요금(시간)</div>
+                  <div className="ml-auto flex items-center gap-1.5">
+                    <span>{parkItem.payment.add_rates}원</span>
+                    <Separator />
+                    <span>{parkItem.payment.add_time_rate}분</span>
+                  </div>
+                </div>
+                {/* <div className="flex items-center text-sm">
                 <div className="">정기권 요금</div>
                 <div className="ml-auto">60,000원</div>
               </div> */}
-            </div>
+              </div>
+            )}
           </div>
 
           <div className="py-4">
@@ -175,24 +176,31 @@ export default function ParkDetailPage({ parkItem }: { parkItem: TParkInfo }) {
               <div className="text-base font-bold">운영 정보</div>
             </div>
             <div className=" flex flex-col gap-2">
-              <div className="flex items-center text-sm">
-                <div className="">평일</div>
-                <div className="ml-auto">
-                  {parkItem.weekday_begin_time} ~ {parkItem.weekday_end_time}
+              {parkItem.hasWeekday && (
+                <div className="flex items-center text-sm">
+                  <div className="">평일</div>
+                  <div className="ml-auto">24시간</div>
                 </div>
-              </div>
-              <div className="flex items-center text-sm">
-                <div className="">토요일</div>
-                <div className="ml-auto">
-                  {parkItem.weekend_begin_time} ~ {parkItem.weekend_end_time}
+              )}
+              {parkItem.hasSaturday && (
+                <div className="flex items-center text-sm">
+                  <div className="">토요일</div>
+                  <div className="ml-auto">24시간</div>
                 </div>
-              </div>
-              <div className="flex items-center text-sm">
-                <div className="">공휴일</div>
-                <div className="ml-auto">
-                  {parkItem.holiday_begin_time} ~ {parkItem.holiday_end_time}
+              )}
+
+              {parkItem.hasSunday && (
+                <div className="flex items-center text-sm">
+                  <div className="">일요일</div>
+                  <div className="ml-auto">24시간</div>
                 </div>
-              </div>
+              )}
+              {parkItem.hasHoliday && (
+                <div className="flex items-center text-sm">
+                  <div className="">공휴일</div>
+                  <div className="ml-auto">24시간</div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -201,13 +209,7 @@ export default function ParkDetailPage({ parkItem }: { parkItem: TParkInfo }) {
               <FileIcon />
               <div className="text-base font-bold">기타 정보</div>
             </div>
-            <div className="text-sm leading-[22px]">
-              {/* 주차장 운영시간 및 요금정보는 실제와 다를 수 있으며, <br />
-              현장 확인 후 이용바랍니다. <br />
-              *월정기권 요금안내
-              <br />
-              (주간35,000원, 야간25,000원) */}
-            </div>
+            <pre className="font-sans text-sm leading-[22px]">{parkItem.info}</pre>
           </div>
         </div>
       </div>
