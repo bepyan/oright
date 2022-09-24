@@ -59,21 +59,26 @@ export default function HomePage() {
   }, []);
 
   const onFocuseItem = (item: any) => {
-    var moveLatLon = new window.kakao.maps.LatLng(item.latitude, item.longitude);
-    setFocusedItem(item);
+    const moveLatLon = new window.kakao.maps.LatLng(item.latitude, item.longitude);
     kmap.panTo(moveLatLon);
 
-    setTimeout(() => {
-      const $hightlightList = document.querySelectorAll('.park-pointer--hightlight');
-      $hightlightList.forEach(($item) => $item.classList.remove('park-pointer--hightlight'));
+    let retry = 0;
+    setFocusedItem(item);
+
+    const highlight = () => {
+      const $highlightList = document.querySelectorAll('.park-pointer--hightlight');
+      $highlightList.forEach(($item) => $item.classList.remove('park-pointer--hightlight'));
 
       const $target = document.getElementById(`park-pointer-${item.id}`);
       if ($target) {
         $target.classList.add('park-pointer--hightlight');
+      } else if (retry < 5) {
+        retry++;
+        setTimeout(highlight, 300);
       }
+    };
 
-      console.log($target);
-    }, 300);
+    highlight();
   };
 
   const navToDetailParkItem = (id: number | string) => {
