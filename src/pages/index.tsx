@@ -1,12 +1,14 @@
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import useSWR, { useSWRConfig } from 'swr';
 
 import ArrowRight from '@/components/icons/ArrowRight';
 import RefreshIcon from '@/components/icons/RefreshIcon';
 import Separator from '@/components/icons/Separator';
 import Layout from '@/components/Layout';
 import ParkPointer from '@/components/ParkPointer';
-import { parkList, 제자들 } from '@/contants/park';
+import { PRIVATE_PARK_INFO_LIST, 제자들 } from '@/contants/park';
+import { TParkInfo, TParkMetaInfo, TParkRealInfo } from '@/types/models';
 import { $ } from '@/utils/core';
 
 declare global {
@@ -19,6 +21,27 @@ export default function HomePage() {
   const router = useRouter();
   const [kmap, setKmap] = useState<any>();
   const [focusedItem, setFocusedItem] = useState<any>();
+
+  const swr = useSWRConfig();
+  const parkInfoMeta = useSWR<TParkMetaInfo[]>('/v1/parkInfoMetadataAll');
+  const parkInfoReal = useSWR<TParkRealInfo[]>('/v1/parkInfoRealTimeAll');
+
+  const onRefresh = () => {
+    swr.mutate('/v1/parkInfoRealTimeAll');
+  };
+
+  const parkRealInfoList: TParkInfo[] = useMemo(() => {
+    if (!parkInfoMeta.data || !parkInfoReal.data) {
+      return [...PRIVATE_PARK_INFO_LIST];
+    }
+
+    const parkInfoList: TParkInfo[] = parkInfoMeta.data.map((info) => {
+      const realInfo = parkInfoReal.data?.find((realInfo) => realInfo.id === info.id);
+      return { ...info, meta: realInfo };
+    });
+
+    return [...PRIVATE_PARK_INFO_LIST, ...parkInfoList];
+  }, [parkInfoMeta.data, parkInfoReal.data]);
 
   useEffect(() => {
     const $script = document.createElement('script');
@@ -35,7 +58,7 @@ export default function HomePage() {
         });
         new window.kakao.maps.Marker({ position: centerPosition, map });
 
-        parkList.forEach((item) => {
+        parkRealInfoList.forEach((item) => {
           const content = ParkPointer({
             item,
             onClick: () => router.push(`/${item.id}`),
@@ -95,15 +118,16 @@ export default function HomePage() {
             'rounded-full border border-[#e2e2e2] bg-white shadow',
             'transition-all active:opacity-80',
           )}
+          onClick={onRefresh}
         >
           <RefreshIcon />
         </button>
       </div>
 
       <div className="h-[40%] overflow-y-scroll border-t border-[#e2e2e2] bg-white">
-        {parkList.map((item, i) => (
+        {parkRealInfoList.map((item) => (
           <ParkItem
-            key={i}
+            key={item.id}
             item={item}
             isSelected={focusedItem?.id === item.id}
             onClick={() => onFocuseItem(item)}
@@ -121,7 +145,7 @@ const ParkItem = ({
   onClick,
   onClickFindWay,
 }: {
-  item: any;
+  item: TParkInfo;
   isSelected?: boolean;
   onClick: () => void;
   onClickFindWay: () => void;
@@ -135,21 +159,24 @@ const ParkItem = ({
       )}
       onClick={onClick}
     >
-      <div className="text-lg font-bold">{item.title}</div>
+      <div className="text-lg font-bold">{item.parking_name}</div>
 
       <div className="mt-[10px] flex flex-col gap-1">
         {item.meta && (
           <div className="flex items-center gap-1.5 text-sm">
             <span
-              className={$('font-bold', item.meta.remain > 0 ? 'text-[#0C79FE]' : 'text-[#697483]')}
+              className={$(
+                'font-bold',
+                item.meta.remains > 0 ? 'text-[#0C79FE]' : 'text-[#697483]',
+              )}
             >
-              {item.meta.remain}대 여유
+              {item.meta.remains}대 여유
             </span>
             <Separator />
-            <span className="text-[#697483]">{item.meta.total}대 전체</span>
+            <span className="text-[#697483]">{item.meta.capacity}대 전체</span>
           </div>
         )}
-        <div className="text-sm text-[#697483]">{item.location}</div>
+        <div className="text-sm text-[#697483]">{item.old_address}</div>
       </div>
       <div className="absolute top-5 right-5">
         <button
