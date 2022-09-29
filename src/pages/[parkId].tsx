@@ -1,17 +1,19 @@
 import { GetServerSidePropsContext } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import useSWR from 'swr';
 
 import ArrowBack from '@/components/icons/ArrowBack';
 import ClockIcon from '@/components/icons/ClockIcon';
 import FileIcon from '@/components/icons/FileIcon';
+import LoadingIcon from '@/components/icons/LoadingIcon';
 import LocaltionIcon from '@/components/icons/LocationIcon';
 import MoneyIcon from '@/components/icons/MoneyIcon';
 import PhoneIcon from '@/components/icons/PhoneIcon';
 import Separator from '@/components/icons/Separator';
 import Layout from '@/components/Layout';
 import { PARK_INFO_LIST } from '@/contants/park';
-import { TParkRealtimeInfo } from '@/types/models';
+import { TParkCapacityInfo, TParkRealtimeInfo } from '@/types/models';
 import { $ } from '@/utils/core';
 
 export async function getServerSideProps({ query }: GetServerSidePropsContext) {
@@ -37,6 +39,10 @@ export async function getServerSideProps({ query }: GetServerSidePropsContext) {
 
 export default function ParkDetailPage({ parkItem }: { parkItem: TParkRealtimeInfo }) {
   const router = useRouter();
+
+  const meta = useSWR<TParkCapacityInfo>(
+    parkItem.parking_type !== 'PRIVATE' && `/v1/parkInfoRealTime?id=${parkItem.id}`,
+  );
 
   const navToFindWay = () => {
     window.open(
@@ -68,15 +74,19 @@ export default function ParkDetailPage({ parkItem }: { parkItem: TParkRealtimeIn
 
       <div className="flex flex-col pb-5">
         <h1 className="self-center text-2xl font-bold">{parkItem.parking_name}</h1>
-        {parkItem.meta && (
+        {meta.data && (
           <div className="mx-5 mt-5 flex h-[100px] items-center rounded-lg bg-white">
             <div className="flex-1 text-center font-bold text-[#0C79FE]">
-              <div className="text-2xl">{parkItem.meta.remains}</div>
+              <div className="text-2xl">
+                {meta.isValidating ? <LoadingIcon /> : meta.data.remains}
+              </div>
               <div className="text-sm">주차 여유</div>
             </div>
             <Separator height={40} />
             <div className="flex-1 text-center font-bold text-[#697483]">
-              <div className="text-2xl">{parkItem.meta.capacity}</div>
+              <div className="text-2xl">
+                {meta.isValidating ? <LoadingIcon /> : meta.data.capacity}
+              </div>
               <div className="text-sm">전체</div>
             </div>
           </div>
@@ -86,7 +96,7 @@ export default function ParkDetailPage({ parkItem }: { parkItem: TParkRealtimeIn
             'mx-5 mt-3',
             'rounded-lg bg-blue-500 p-[15px] text-center text-lg font-bold text-white',
             'transition-all active:bg-blue-400',
-            !parkItem.meta && 'mt-12',
+            !meta.data && 'mt-12',
           )}
           onClick={navToFindWay}
         >
