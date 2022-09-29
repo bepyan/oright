@@ -9,7 +9,7 @@ import Separator from '@/components/icons/Separator';
 import Layout from '@/components/Layout';
 import ParkPointer from '@/components/ParkPointer';
 import { PARK_INFO_LIST, 제자들 } from '@/contants/park';
-import { TParkCapacityInfo, TParkInfo, TParkRealtimeInfo } from '@/types/models';
+import { TParkCapacityInfo, TParkRealtimeInfo } from '@/types/models';
 import { $ } from '@/utils/core';
 
 declare global {
@@ -21,10 +21,10 @@ declare global {
 export default function HomePage() {
   const router = useRouter();
   const [kmap, setKmap] = useState<any>();
-  const [focusedItem, setFocusedItem] = useState<any>();
+  const [focusedItem, setFocusedItem] = useState<TParkRealtimeInfo>();
+  const [parkMarkerList, setParkMarkerList] = useState<any[]>([]);
 
   const swr = useSWRConfig();
-  const parkInfoMeta = useSWR<TParkInfo[]>('/v1/parkInfoMetadataAll');
   const parkInfoReal = useSWR<TParkCapacityInfo[]>('/v1/parkInfoRealTimeAll');
 
   const onRefresh = () => {
@@ -32,25 +32,36 @@ export default function HomePage() {
   };
 
   const parkRealInfoList: TParkRealtimeInfo[] = useMemo(() => {
-    if (!parkInfoMeta.data || !parkInfoReal.data) {
+    if (!parkInfoReal.data) {
       return [...PARK_INFO_LIST];
     }
 
-    const parkInfoList: TParkInfo[] = parkInfoMeta.data.map((info) => {
+    const parkInfoList: TParkRealtimeInfo[] = PARK_INFO_LIST.map((info) => {
       const realInfo = parkInfoReal.data?.find((realInfo) => realInfo.id === info.id);
       return { ...info, meta: realInfo };
     });
 
-    return [...PARK_INFO_LIST, ...parkInfoList];
-  }, [parkInfoMeta.data, parkInfoReal.data]);
+    parkInfoList.forEach((item) => {
+      if (item.meta) {
+        const target = parkMarkerList.find((v) => v.cc.dataset.id === item.id);
+        const $target = target?.cc?.querySelector('div');
+
+        if ($target) {
+          $target.innerHTML = `${item.meta.remains}대 여유`;
+        }
+      }
+    });
+
+    return parkInfoList;
+  }, [parkInfoReal.data]);
 
   useEffect(() => {
-    if (parkInfoMeta.isValidating || parkInfoReal.isValidating) {
+    if (parkInfoReal.isValidating) {
       NProgress.start();
     } else {
       NProgress.done();
     }
-  }, [parkInfoMeta.isValidating, parkInfoReal.isValidating]);
+  }, [parkInfoReal.isValidating]);
 
   useEffect(() => {
     const $script = document.createElement('script');
@@ -67,19 +78,20 @@ export default function HomePage() {
         });
         new window.kakao.maps.Marker({ position: centerPosition, map });
 
-        PARK_INFO_LIST.forEach((item) => {
+        const parkMarkerList = PARK_INFO_LIST.map((item) => {
           const content = ParkPointer({
             item,
             onClick: () => router.push(`/${item.id}`),
           });
-          const position = new window.kakao.maps.LatLng(item.latitude, item.longitude);
-          new window.kakao.maps.CustomOverlay({
+
+          return new window.kakao.maps.CustomOverlay({
             map,
             content,
-            position,
+            position: new window.kakao.maps.LatLng(item.latitude, item.longitude),
           });
         });
 
+        setParkMarkerList(parkMarkerList);
         setKmap(map);
       });
     };
@@ -90,27 +102,19 @@ export default function HomePage() {
     };
   }, []);
 
-  const onFocuseItem = (item: any) => {
+  const onFocuseItem = (item: TParkRealtimeInfo) => {
     const moveLatLon = new window.kakao.maps.LatLng(item.latitude, item.longitude);
     kmap.panTo(moveLatLon);
 
-    let retry = 0;
+    const prevItem = parkMarkerList.find((v) => v.cc.dataset.id === focusedItem?.id);
+    prevItem?.setZIndex(0);
+    prevItem?.cc.classList.remove('park-pointer--hightlight');
+
+    const targetItem = parkMarkerList.find((v) => v.cc.dataset.id === item.id);
+    targetItem?.setZIndex(100);
+    targetItem?.cc.classList.add('park-pointer--hightlight');
+
     setFocusedItem(item);
-
-    const highlight = () => {
-      const $highlightList = document.querySelectorAll('.park-pointer--hightlight');
-      $highlightList.forEach(($item) => $item.classList.remove('park-pointer--hightlight'));
-
-      const $target = document.getElementById(`park-pointer-${item.id}`);
-      if ($target) {
-        $target.classList.add('park-pointer--hightlight');
-      } else if (retry < 5) {
-        retry++;
-        setTimeout(highlight, 300);
-      }
-    };
-
-    highlight();
   };
 
   const navToDetailParkItem = (id: number | string) => {
@@ -134,7 +138,7 @@ export default function HomePage() {
       </div>
 
       <div className="h-[40%] overflow-y-scroll border-t border-[#e2e2e2] bg-white">
-        {PARK_INFO_LIST.map((item) => (
+        {parkRealInfoList.map((item) => (
           <ParkItem
             key={item.id}
             item={item}

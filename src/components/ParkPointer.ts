@@ -1,18 +1,21 @@
+import { TParkRealtimeInfo } from '@/types/models';
 import { $ } from '@/utils/core';
 
-type TParkPointerStatus = 'hightlight' | 'nomal' | 'full';
-
 interface ParkPointerProps {
-  item: any;
+  item: TParkRealtimeInfo;
   onClick: () => void;
 }
 
 export default function ParkPointer({ item, onClick }: ParkPointerProps) {
-  const title = item.meta ? `${item.meta.remain}대 여유` : 'P';
+  const title = item.meta ? `${item.meta.remains}대 여유` : 'P';
 
   const $root = document.createElement('div');
   $root.id = `park-pointer-${item.id}`;
-  $root.className = $('park-pointer flex flex-col items-center', item.meta?.remain === 0 && 'full');
+  $root.dataset.id = item.id;
+  $root.className = $(
+    'park-pointer flex flex-col items-center',
+    item.meta?.remains === 0 && 'full',
+  );
   $root.innerHTML = `
         <div
             class="${$(
