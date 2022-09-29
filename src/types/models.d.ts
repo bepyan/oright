@@ -8,6 +8,7 @@ export type TParkInfo = {
   latitude: number;
   longitude: number;
   info: sring;
+  capacity?: number;
 
   payment?: {
     rates: number;

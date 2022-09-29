@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 
 import ArrowRight from '@/components/icons/ArrowRight';
+import LoadingIcon from '@/components/icons/LoadingIcon';
 import RefreshIcon from '@/components/icons/RefreshIcon';
 import Separator from '@/components/icons/Separator';
 import Layout from '@/components/Layout';
@@ -175,18 +176,22 @@ const ParkItem = ({
       <div className="text-lg font-bold">{item.parking_name}</div>
 
       <div className="mt-[10px] flex flex-col gap-1">
-        {item.meta && (
+        {item.parking_type !== 'PRIVATE' && (
           <div className="flex items-center gap-1.5 text-sm">
             <span
               className={$(
-                'font-bold',
-                item.meta.remains > 0 ? 'text-[#0C79FE]' : 'text-[#697483]',
+                'flex items-center font-bold',
+                item?.meta?.remains ? 'text-[#0C79FE]' : 'text-[#697483]',
               )}
             >
-              {item.meta.remains}대 여유
+              {item?.meta?.remains === undefined ? (
+                <LoadingIcon className="h-4" />
+              ) : (
+                `${item?.meta?.remains}대 여유`
+              )}
             </span>
             <Separator />
-            <span className="text-[#697483]">{item.meta.capacity}대 전체</span>
+            <span className="text-[#697483]">{item.capacity}대 전체</span>
           </div>
         )}
         <div className="text-sm text-[#697483]">{item.old_address}</div>

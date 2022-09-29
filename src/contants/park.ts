@@ -16,6 +16,7 @@ export const PARK_INFO_LIST: TParkInfo[] = [
     latitude: 37.49528691901275,
     longitude: 127.15556077987078,
     info: '주차장 운영시간 및 요금정보는 실제와 다를 수 있으며,\n현장 확인 후 이용바랍니다.\n*월정기권 요금안내\n(주간35,000원, 야간25,000원)',
+    capacity: 217,
 
     payment: {
       rates: 50,
@@ -40,6 +41,7 @@ export const PARK_INFO_LIST: TParkInfo[] = [
     latitude: 37.49436437,
     longitude: 127.1561092,
     info: '주차장 운영시간 및 요금정보는 실제와 다를 수 있으며,\n현장 확인 후 이용바랍니다.\n*월정기권 요금안내\n(주간35,000원, 야간25,000원)',
+    capacity: 116,
 
     payment: {
       rates: 50,
@@ -64,6 +66,7 @@ export const PARK_INFO_LIST: TParkInfo[] = [
     latitude: 37.500313,
     longitude: 127.154959,
     info: '주차장 운영시간 및 요금정보는 실제와 다를 수 있으며,\n현장 확인 후 이용바랍니다.\n*월정기권 요금안내\n(주간35,000원, 야간25,000원)',
+    capacity: 140,
 
     payment: {
       rates: 50,

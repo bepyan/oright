@@ -74,19 +74,17 @@ export default function ParkDetailPage({ parkItem }: { parkItem: TParkRealtimeIn
 
       <div className="flex flex-col pb-5">
         <h1 className="self-center text-2xl font-bold">{parkItem.parking_name}</h1>
-        {meta.data && (
+        {parkItem.parking_type !== 'PRIVATE' && (
           <div className="mx-5 mt-5 flex h-[100px] items-center rounded-lg bg-white">
             <div className="flex-1 text-center font-bold text-[#0C79FE]">
               <div className="text-2xl">
-                {meta.isValidating ? <LoadingIcon /> : meta.data.remains}
+                {!meta.data?.remains ? <LoadingIcon /> : meta.data.remains}
               </div>
               <div className="text-sm">주차 여유</div>
             </div>
             <Separator height={40} />
             <div className="flex-1 text-center font-bold text-[#697483]">
-              <div className="text-2xl">
-                {meta.isValidating ? <LoadingIcon /> : meta.data.capacity}
-              </div>
+              <div className="text-2xl">{meta.data?.capacity || parkItem.capacity}</div>
               <div className="text-sm">전체</div>
             </div>
           </div>
