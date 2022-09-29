@@ -191,7 +191,7 @@ const ParkItem = ({
               )}
             </span>
             <Separator />
-            <span className="text-[#697483]">{item.capacity}대 전체</span>
+            <span className="text-[#697483]">{item?.meta?.capacity || item.capacity}대 전체</span>
           </div>
         )}
         <div className="text-sm text-[#697483]">{item.old_address}</div>
