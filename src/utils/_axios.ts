@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 
 const _axios: AxiosInstance = axios.create({
-  baseURL: process.env.API_ENDPOINT,
+  baseURL: process.env.NEXT_PUBLIC_API_ENDPOINT,
   timeout: 10000,
 });
 
@@ -10,6 +10,7 @@ _axios.interceptors.request.use(
     ...config,
     headers: {
       'Content-Type': 'application/json',
+      Authorization: process.env.NEXT_PUBLIC_API_KEY,
       ...config.headers,
     },
   }),

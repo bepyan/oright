@@ -1,12 +1,16 @@
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import NProgress from 'nprogress';
+import React, { useEffect, useMemo, useState } from 'react';
+import useSWR, { useSWRConfig } from 'swr';
 
 import ArrowRight from '@/components/icons/ArrowRight';
+import LoadingIcon from '@/components/icons/LoadingIcon';
 import RefreshIcon from '@/components/icons/RefreshIcon';
 import Separator from '@/components/icons/Separator';
 import Layout from '@/components/Layout';
 import ParkPointer from '@/components/ParkPointer';
-import { parkList, 제자들 } from '@/contants/park';
+import { PARK_INFO_LIST, 제자들 } from '@/contants/park';
+import { TParkCapacityInfo, TParkRealtimeInfo } from '@/types/models';
 import { $ } from '@/utils/core';
 
 declare global {
@@ -18,7 +22,47 @@ declare global {
 export default function HomePage() {
   const router = useRouter();
   const [kmap, setKmap] = useState<any>();
-  const [focusedItem, setFocusedItem] = useState<any>();
+  const [focusedItem, setFocusedItem] = useState<TParkRealtimeInfo>();
+  const [parkMarkerList, setParkMarkerList] = useState<any[]>([]);
+
+  const swr = useSWRConfig();
+  const parkInfoReal = useSWR<TParkCapacityInfo[]>('/v1/parkInfoRealTimeAll');
+
+  const onRefresh = () => {
+    swr.mutate('/v1/parkInfoRealTimeAll');
+  };
+
+  const parkRealInfoList: TParkRealtimeInfo[] = useMemo(() => {
+    if (!parkInfoReal.data) {
+      return [...PARK_INFO_LIST];
+    }
+
+    const parkInfoList: TParkRealtimeInfo[] = PARK_INFO_LIST.map((info) => {
+      const realInfo = parkInfoReal.data?.find((realInfo) => realInfo.id === info.id);
+      return { ...info, meta: realInfo };
+    });
+
+    parkInfoList.forEach((item) => {
+      if (item.meta) {
+        const target = parkMarkerList.find((v) => v.cc.dataset.id === item.id);
+        const $target = target?.cc?.querySelector('div');
+
+        if ($target) {
+          $target.innerHTML = `${item.meta.remains}대 여유`;
+        }
+      }
+    });
+
+    return parkInfoList;
+  }, [parkInfoReal.data]);
+
+  useEffect(() => {
+    if (parkInfoReal.isValidating) {
+      NProgress.start();
+    } else {
+      NProgress.done();
+    }
+  }, [parkInfoReal.isValidating]);
 
   useEffect(() => {
     const $script = document.createElement('script');
@@ -35,19 +79,20 @@ export default function HomePage() {
         });
         new window.kakao.maps.Marker({ position: centerPosition, map });
 
-        parkList.forEach((item) => {
+        const parkMarkerList = PARK_INFO_LIST.map((item) => {
           const content = ParkPointer({
             item,
             onClick: () => router.push(`/${item.id}`),
           });
-          const position = new window.kakao.maps.LatLng(item.latitude, item.longitude);
-          new window.kakao.maps.CustomOverlay({
+
+          return new window.kakao.maps.CustomOverlay({
             map,
             content,
-            position,
+            position: new window.kakao.maps.LatLng(item.latitude, item.longitude),
           });
         });
 
+        setParkMarkerList(parkMarkerList);
         setKmap(map);
       });
     };
@@ -58,22 +103,19 @@ export default function HomePage() {
     };
   }, []);
 
-  const onFocuseItem = (item: any) => {
-    var moveLatLon = new window.kakao.maps.LatLng(item.latitude, item.longitude);
-    setFocusedItem(item);
+  const onFocuseItem = (item: TParkRealtimeInfo) => {
+    const moveLatLon = new window.kakao.maps.LatLng(item.latitude, item.longitude);
     kmap.panTo(moveLatLon);
 
-    setTimeout(() => {
-      const $hightlightList = document.querySelectorAll('.park-pointer--hightlight');
-      $hightlightList.forEach(($item) => $item.classList.remove('park-pointer--hightlight'));
+    const prevItem = parkMarkerList.find((v) => v.cc.dataset.id === focusedItem?.id);
+    prevItem?.setZIndex(0);
+    prevItem?.cc.classList.remove('park-pointer--hightlight');
 
-      const $target = document.getElementById(`park-pointer-${item.id}`);
-      if ($target) {
-        $target.classList.add('park-pointer--hightlight');
-      }
+    const targetItem = parkMarkerList.find((v) => v.cc.dataset.id === item.id);
+    targetItem?.setZIndex(100);
+    targetItem?.cc.classList.add('park-pointer--hightlight');
 
-      console.log($target);
-    }, 300);
+    setFocusedItem(item);
   };
 
   const navToDetailParkItem = (id: number | string) => {
@@ -90,15 +132,16 @@ export default function HomePage() {
             'rounded-full border border-[#e2e2e2] bg-white shadow',
             'transition-all active:opacity-80',
           )}
+          onClick={onRefresh}
         >
           <RefreshIcon />
         </button>
       </div>
 
       <div className="h-[40%] overflow-y-scroll border-t border-[#e2e2e2] bg-white">
-        {parkList.map((item, i) => (
+        {parkRealInfoList.map((item) => (
           <ParkItem
-            key={i}
+            key={item.id}
             item={item}
             isSelected={focusedItem?.id === item.id}
             onClick={() => onFocuseItem(item)}
@@ -116,7 +159,7 @@ const ParkItem = ({
   onClick,
   onClickFindWay,
 }: {
-  item: any;
+  item: TParkRealtimeInfo;
   isSelected?: boolean;
   onClick: () => void;
   onClickFindWay: () => void;
@@ -130,21 +173,28 @@ const ParkItem = ({
       )}
       onClick={onClick}
     >
-      <div className="text-lg font-bold">{item.title}</div>
+      <div className="text-lg font-bold">{item.parking_name}</div>
 
       <div className="mt-[10px] flex flex-col gap-1">
-        {item.meta && (
+        {item.parking_type !== 'PRIVATE' && (
           <div className="flex items-center gap-1.5 text-sm">
             <span
-              className={$('font-bold', item.meta.remain > 0 ? 'text-[#0C79FE]' : 'text-[#697483]')}
+              className={$(
+                'flex items-center font-bold',
+                item?.meta?.remains ? 'text-[#0C79FE]' : 'text-[#697483]',
+              )}
             >
-              {item.meta.remain}대 여유
+              {item?.meta?.remains === undefined ? (
+                <LoadingIcon className="h-4" />
+              ) : (
+                `${item?.meta?.remains}대 여유`
+              )}
             </span>
             <Separator />
-            <span className="text-[#697483]">{item.meta.total}대 전체</span>
+            <span className="text-[#697483]">{item.capacity}대 전체</span>
           </div>
         )}
-        <div className="text-sm text-[#697483]">{item.location}</div>
+        <div className="text-sm text-[#697483]">{item.old_address}</div>
       </div>
       <div className="absolute top-5 right-5">
         <button

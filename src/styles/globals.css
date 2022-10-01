@@ -55,3 +55,19 @@ body {
 .park-pointer--full > svg {
   fill: #999999;
 }
+
+/* nprogress */
+:root {
+  --nprogress-color: #0c79fe;
+}
+
+#nprogress .bar {
+  background: var(--nprogress-color) !important;
+  padding: 0 10px !important;
+  height: 3px !important;
+}
+
+#nprogress .spinner .spinner-icon {
+  border-top-color: var(--nprogress-color) !important;
+  border-left-color: var(--nprogress-color) !important;
+}
