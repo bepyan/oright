@@ -7,14 +7,12 @@ interface ParkPointerProps {
 }
 
 export default function ParkPointer({ item, onClick }: ParkPointerProps) {
-  const title = item.meta ? `${item.meta.remains}대 여유` : 'P';
-
   const $root = document.createElement('div');
   $root.id = `park-pointer-${item.id}`;
   $root.dataset.id = item.id;
   $root.className = $(
     'park-pointer flex flex-col items-center',
-    item.meta?.remains === 0 && 'full',
+    item.meta?.remains === 0 && 'park-pointer--full',
   );
   $root.innerHTML = `
         <div
@@ -23,7 +21,7 @@ export default function ParkPointer({ item, onClick }: ParkPointerProps) {
               'transition-all active:opacity-70',
             )}"
         >
-            ${title}
+            P
         </div>
         <svg
             width="6"

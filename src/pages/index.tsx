@@ -11,6 +11,7 @@ import Layout from '@/components/Layout';
 import ParkPointer from '@/components/ParkPointer';
 import { PARK_INFO_LIST, 제자들 } from '@/contants/park';
 import { TParkCapacityInfo, TParkRealtimeInfo } from '@/types/models';
+import { checkIsParkFetching } from '@/utils/checks';
 import { $ } from '@/utils/core';
 
 declare global {
@@ -164,6 +165,8 @@ const ParkItem = ({
   onClick: () => void;
   onClickFindWay: () => void;
 }) => {
+  const isParkFetching = checkIsParkFetching(item);
+
   return (
     <div
       className={$(
@@ -176,7 +179,7 @@ const ParkItem = ({
       <div className="text-lg font-bold">{item.parking_name}</div>
 
       <div className="mt-[10px] flex flex-col gap-1">
-        {item.parking_type !== 'PRIVATE' && (
+        {isParkFetching && (
           <div className="flex items-center gap-1.5 text-sm">
             <span
               className={$(
@@ -191,7 +194,7 @@ const ParkItem = ({
               )}
             </span>
             <Separator />
-            <span className="text-[#697483]">{item.capacity}대 전체</span>
+            <span className="text-[#697483]">{item?.meta?.capacity || item.capacity}대 전체</span>
           </div>
         )}
         <div className="text-sm text-[#697483]">{item.old_address}</div>

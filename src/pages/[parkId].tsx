@@ -1,7 +1,7 @@
 import { GetServerSidePropsContext } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 
 import ArrowBack from '@/components/icons/ArrowBack';
 import ClockIcon from '@/components/icons/ClockIcon';
@@ -10,10 +10,12 @@ import LoadingIcon from '@/components/icons/LoadingIcon';
 import LocaltionIcon from '@/components/icons/LocationIcon';
 import MoneyIcon from '@/components/icons/MoneyIcon';
 import PhoneIcon from '@/components/icons/PhoneIcon';
+import RefreshIcon from '@/components/icons/RefreshIcon';
 import Separator from '@/components/icons/Separator';
 import Layout from '@/components/Layout';
 import { PARK_INFO_LIST } from '@/contants/park';
 import { TParkCapacityInfo, TParkRealtimeInfo } from '@/types/models';
+import { checkIsParkFetching } from '@/utils/checks';
 import { $ } from '@/utils/core';
 
 export async function getServerSideProps({ query }: GetServerSidePropsContext) {
@@ -39,10 +41,16 @@ export async function getServerSideProps({ query }: GetServerSidePropsContext) {
 
 export default function ParkDetailPage({ parkItem }: { parkItem: TParkRealtimeInfo }) {
   const router = useRouter();
+  const isParkFetching = checkIsParkFetching(parkItem);
 
+  const swr = useSWRConfig();
   const meta = useSWR<TParkCapacityInfo>(
     parkItem.parking_type !== 'PRIVATE' && `/v1/parkInfoRealTime?id=${parkItem.id}`,
   );
+
+  const onRefresh = () => {
+    swr.mutate(`/v1/parkInfoRealTime?id=${parkItem.id}`);
+  };
 
   const navToFindWay = () => {
     window.open(
@@ -64,17 +72,23 @@ export default function ParkDetailPage({ parkItem }: { parkItem: TParkRealtimeIn
 
   return (
     <Layout className="">
-      <div className="flex px-5 pt-[30px] pb-[10px]">
+      <div className="flex items-center px-5 pt-[30px] pb-[10px]">
         <Link href="/">
           <a>
             <ArrowBack className="cursor-pointer transition-all hover:opacity-70" />
           </a>
         </Link>
+
+        {isParkFetching && (
+          <button className={$('ml-auto transition-all active:opacity-80')} onClick={onRefresh}>
+            <RefreshIcon />
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col pb-5">
         <h1 className="self-center text-2xl font-bold">{parkItem.parking_name}</h1>
-        {parkItem.parking_type !== 'PRIVATE' && (
+        {isParkFetching && (
           <div className="mx-5 mt-5 flex h-[100px] items-center rounded-lg bg-white">
             <div className="flex-1 text-center font-bold text-[#0C79FE]">
               <div className="text-2xl">
@@ -91,10 +105,10 @@ export default function ParkDetailPage({ parkItem }: { parkItem: TParkRealtimeIn
         )}
         <button
           className={$(
-            'mx-5 mt-3',
+            'mx-5',
             'rounded-lg bg-blue-500 p-[15px] text-center text-lg font-bold text-white',
             'transition-all active:bg-blue-400',
-            !meta.data && 'mt-12',
+            isParkFetching ? 'mt-3' : 'mt-12',
           )}
           onClick={navToFindWay}
         >
