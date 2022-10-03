@@ -1,6 +1,8 @@
 import { GetServerSidePropsContext } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import NProgress from 'nprogress';
+import { useEffect } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 
 import ArrowBack from '@/components/icons/ArrowBack';
@@ -47,6 +49,14 @@ export default function ParkDetailPage({ parkItem }: { parkItem: TParkRealtimeIn
   const meta = useSWR<TParkCapacityInfo>(
     parkItem.parking_type !== 'PRIVATE' && `/v1/parkInfoRealTime?id=${parkItem.id}`,
   );
+
+  useEffect(() => {
+    if (meta.isValidating) {
+      NProgress.start();
+    } else {
+      NProgress.done();
+    }
+  }, [meta.isValidating]);
 
   const onRefresh = () => {
     swr.mutate(`/v1/parkInfoRealTime?id=${parkItem.id}`);
