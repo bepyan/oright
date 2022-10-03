@@ -87,8 +87,8 @@ export const PARK_INFO_LIST: TParkInfo[] = [
     parking_type: 'PRIVATE',
     tel: '02-488-9777',
     old_address: '경기도 하남시 감이동 358',
-    latitude: 37.494216764872,
-    longitude: 127.15618363796,
+    latitude: 37.49426356143956,
+    longitude: 127.16014238991436,
     info: '단기주차전용\n노약자, 여성, 초등부이하 자녀 수반 차량을 위한 주차장입니다.\n자세한 문의는 02-488-9777로 전화주세요.',
 
     hasWeekday: false,
@@ -102,8 +102,8 @@ export const PARK_INFO_LIST: TParkInfo[] = [
     parking_type: 'PRIVATE',
     tel: '02-488-9777',
     old_address: '서울특별시 송파구 마천동 237-1',
-    latitude: 37.484216764872,
-    longitude: 127.15718363796,
+    latitude: 37.49929250475288,
+    longitude: 127.16082035079191,
     info: '예약제로 운영하는 주차장입니다.\n제자들 링크를 통해 예약을 하시고 주차부탁드립니다.\n자세한 문의는 02-488-9777로 전화주세요.',
 
     hasWeekday: false,

@@ -34,28 +34,27 @@ export default function HomePage() {
   };
 
   const parkRealInfoList: TParkRealtimeInfo[] = useMemo(() => {
-    if (!parkInfoReal.data) {
-      return [...PARK_INFO_LIST];
-    }
-
     const parkInfoList: TParkRealtimeInfo[] = PARK_INFO_LIST.map((info) => {
       const realInfo = parkInfoReal.data?.find((realInfo) => realInfo.id === info.id);
       return { ...info, meta: realInfo };
     });
 
-    parkInfoList.forEach((item) => {
+    return parkInfoList;
+  }, [parkInfoReal.data]);
+
+  useEffect(() => {
+    parkRealInfoList.forEach((item) => {
       if (item.meta) {
         const target = parkMarkerList.find((v) => v.cc.dataset.id === item.id);
         const $target = target?.cc?.querySelector('div');
 
         if ($target) {
+          console.log('1234');
           $target.innerHTML = `${item.meta.remains}대 여유`;
         }
       }
     });
-
-    return parkInfoList;
-  }, [parkInfoReal.data]);
+  }, [kmap, parkRealInfoList]);
 
   useEffect(() => {
     if (parkInfoReal.isValidating) {
@@ -76,7 +75,7 @@ export default function HomePage() {
         const centerPosition = new window.kakao.maps.LatLng(제자들.latitude, 제자들.longitude);
         const map = new window.kakao.maps.Map(document.getElementById('map'), {
           center: centerPosition,
-          level: 3,
+          level: 4,
         });
         new window.kakao.maps.Marker({ position: centerPosition, map });
 
