@@ -2,6 +2,7 @@ import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import Script from 'next/script';
 import NProgress from 'nprogress';
 import { useEffect } from 'react';
 import { SWRConfig } from 'swr';
@@ -48,6 +49,13 @@ function MyApp({ Component, pageProps }: AppProps) {
       </Head>
 
       <Component {...pageProps} />
+
+      {/* google adsense */}
+      <Script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2820184336962070"
+        crossOrigin="anonymous"
+      />
     </SWRConfig>
   );
 }
